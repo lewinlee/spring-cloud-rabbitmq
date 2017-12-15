@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 @RestController
+@RequestMapping("/rabbitmq")
 public class RabbitMQController {
 
     //队列名称
@@ -17,11 +18,15 @@ public class RabbitMQController {
 
     @Value("${server.port}")
     String port;
-    @RequestMapping("/rabbitmq")
+    @RequestMapping("/hello")
     public String home(@RequestParam String name) {
         return "hi "+name+",i am from port:" +port;
     }
 
+    /**
+     * 消息生产者
+     * @param name
+     */
     @RequestMapping("/put")
     public void put(@RequestParam(value="name", defaultValue=QUEUE_NAME) String name){
         /**
@@ -33,7 +38,7 @@ public class RabbitMQController {
         factory.setUsername("root");
         factory.setPassword("123456");
         factory.setVirtualHost("/");
-        factory.setPort(5672);
+        factory.setPort(5672);//默认监听端口是5672，15672是管理界面端口
 
         Connection connection = null;
 
@@ -59,6 +64,10 @@ public class RabbitMQController {
         }
     }
 
+    /**
+     * 消息消费者
+     * @param name
+     */
     @RequestMapping("/get")
     public void get(@RequestParam(value="name", defaultValue=QUEUE_NAME) String name){
         //打开连接和创建频道，与发送端一样
